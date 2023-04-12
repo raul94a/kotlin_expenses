@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/comunToExpense"
+    app:startDestination="@+id/navigation_personal">
+
+    <fragment
+        android:id="@+id/navigation_personal"
+        android:name="test.raul.kotlin.ui.personales.HomeFragment"
+        android:label="Gastos"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_info"
+        android:name="test.raul.kotlin.ui.info.NotificationsFragment"
+        android:label="Info"
+        tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="test.raul.kotlin.ui.settings.InfoFragment"
+        android:label="Ajustes"
+        tools:layout="@layout/fragment_info" />
+</navigation>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout
+    android:id="@+id/linlaySpinner"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <!-- Add your custom views here for each item in the Spinner -->
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_weight="0.05"
+            android:background="@color/purple_200"
+            android:contentDescription="Category color" />
+
+        <TextView
+            android:layout_weight="0.9"
+            android:id="@+id/textView"
+            android:paddingStart="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="Category"
+            android:layout_marginStart="8dp"
+            tools:ignore="RtlSymmetry" />
+
+
+    </LinearLayout>
