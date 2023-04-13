@@ -1,4 +1,4 @@
-package test.raul.kotlin.ui.personales.comunes
+package test.raul.kotlin.ui.comunes
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

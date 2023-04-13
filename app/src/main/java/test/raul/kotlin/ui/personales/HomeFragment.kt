@@ -18,66 +18,69 @@ import test.raul.kotlin.ui.create_expense.CreateExpenseActivity
 
 class HomeFragment : Fragment() {
 
-private var _binding: FragmentHomeBinding? = null
-  // This property is only valid between onCreateView and
-  // onDestroyView.
-  private val binding get() = _binding!!
-  private var _navController: NavHostController? = null
-  private lateinit var homeViewModel : HomeViewModel
-  private lateinit var startForResult : ActivityResultLauncher<Intent>
+    private var _binding: FragmentHomeBinding? = null
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
+    private var _navController: NavHostController? = null
+    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var startForResult: ActivityResultLauncher<Intent>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-            if(it.resultCode == 99){
-                Log.e("Data", "${it.data}")
-                val str = it.data?.getStringExtra("back")
-                Log.e("BACK", "$str")
-                homeViewModel.addString(str ?: "es nula")
+        startForResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == 99) {
+                    Log.e("Data", "${it.data}")
+                    val str = it.data?.getStringExtra("expense")
+                    Log.e("Expense", "$str")
+                    homeViewModel.addString(str ?: "es nula")
+                    //add category
+                }
             }
-        }
     }
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-   homeViewModel =
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        homeViewModel =
             ViewModelProvider(requireActivity()).get(HomeViewModel::class.java)
 
-    homeViewModel.changeText("Texto actualizado desde el fragmento home");
+        homeViewModel.changeText("Texto actualizado desde el fragmento home");
 
-    _navController = NavHostController(requireContext())
+        _navController = NavHostController(requireContext())
 
 
 
-    _binding = FragmentHomeBinding.inflate(inflater, container, false)
-    val root: View = binding.root
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val root: View = binding.root
 
-    binding.fab.setOnClickListener {
+        binding.fab.setOnClickListener {
 
-      val intent: Intent = Intent(requireActivity(), CreateExpenseActivity::class.java)
-        startForResult.launch(intent)
+            val intent: Intent = Intent(requireActivity(), CreateExpenseActivity::class.java)
+            startForResult.launch(intent)
 
+        }
+
+        val textView: TextView = binding.textHome
+        homeViewModel.text.observe(viewLifecycleOwner) {
+            textView.text = it
+        }
+        homeViewModel.strings.observe(viewLifecycleOwner) { at ->
+            val strs = at.size
+            textView.text = "El numero de strings es: $strs"
+        }
+        return root
     }
 
-    val textView: TextView = binding.textHome
-    homeViewModel.text.observe(viewLifecycleOwner) {
-      textView.text = it
-    }
-    homeViewModel.strings.observe(viewLifecycleOwner) { at ->
-      val strs = at.size
-      textView.text = "El numero de strings es: $strs"
-    }
-    return root
-  }
-
-override fun onDestroyView() {
+    override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
 
 
 }

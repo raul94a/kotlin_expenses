@@ -8,13 +8,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.CursorAdapter
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Spinner
-import android.widget.TextView
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import test.raul.kotlin.R
@@ -36,15 +33,22 @@ class FirstFragment : Fragment() {
     private var _binding: FragmentFirstBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var _dateSelectorImageView : ImageView
+    private lateinit var _dateSelectorImageView: ImageView
     private lateinit var _tvDate: TextView
-    private lateinit var  _categoriesDropdown : Spinner
+
+    private lateinit var _categoriesDropdown: Spinner
     private lateinit var arrayAdapter: CategoriesSpinnerAdapter
     private lateinit var _etPrice: EditText
-    private lateinit var _etDescription : EditText
-    private lateinit var _expense: Expense
+    private lateinit var _etDescription: EditText
+    private  var _expense: Expense? = null
+    private lateinit var _loadingLayout: ConstraintLayout
+    private lateinit var _successLayout: ConstraintLayout
+    private lateinit var _successArrow: ImageView
+    private lateinit var _mainView: View
+    private lateinit var _successView: View
+    private lateinit var _loadingView: View
 
-
+    private lateinit var vm: ExpenseHandlerViewModel
     private var _category: Long = 0
 
     override fun onCreateView(
@@ -53,27 +57,32 @@ class FirstFragment : Fragment() {
     ): View {
 
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
-        bindUI()
 
+
+//         _successLayout = inflater.inflate(R.layout.included_layout2, rootView, false)
+//         _loadingLayout= inflater.inflate(R.layout.included_layout3, rootView, false)
+        bindUI()
 
 
         onClickDateSelectorIcon()
 
         //observe
-
-        val vm = ViewModelProvider(requireActivity()).get(ExpenseHandlerViewModel::class.java)
+        vm = ViewModelProvider(requireActivity()).get(ExpenseHandlerViewModel::class.java)
         vm.getCategories()
-        vm.categories.observe(viewLifecycleOwner) {
-            arrayAdapter = CategoriesSpinnerAdapter(requireContext(),it)
 
-            _categoriesDropdown.adapter = arrayAdapter
-        }
+        observeVM()
 
+        onSelectCategory()
 
+        return binding.root
+
+    }
+
+    private fun onSelectCategory() {
         _categoriesDropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val selectedName = arrayAdapter.getItem(p2)
-           Log.e("SELECTED", "${selectedName?.id}")
+                Log.e("SELECTED", "${selectedName?.id}")
                 _category = selectedName!!.id
             }
 
@@ -82,24 +91,59 @@ class FirstFragment : Fragment() {
             }
 
         }
+    }
 
-        return binding.root
+    fun observeVM() {
+        vm.expense.observe(viewLifecycleOwner){
+            _expense  = it
+        }
+        vm.categories.observe(viewLifecycleOwner) {
+            arrayAdapter = CategoriesSpinnerAdapter(requireContext(), it)
 
+            _categoriesDropdown.adapter = arrayAdapter
+        }
+        vm.status.observe(viewLifecycleOwner) {
+            Log.e("Status changed to", "$it")
+            when (it) {
+                ExpenseHandlerStatus.HANDLE -> {
+                    _mainView.visibility = View.VISIBLE
+                    _loadingView.visibility = View.GONE
+                    _successView.visibility = View.GONE
+                }
+                ExpenseHandlerStatus.LOADING -> {
+                    _mainView.visibility = View.GONE
+                    _loadingView.visibility = View.VISIBLE
+                    _successView.visibility = View.GONE
+                }
+                else -> {
+                    val animation = AnimationUtils.loadAnimation(requireContext(), R.anim.bounce)
+                    animation.repeatCount = Animation.INFINITE
+                    _successArrow.startAnimation(animation)
+                    _mainView.visibility = View.GONE
+                    _loadingView.visibility = View.GONE
+                    _successView.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonFirst.setOnClickListener {
+        binding.root.findViewById<Button>(R.id.button_first).setOnClickListener {
+            vm.changeStatus(ExpenseHandlerStatus.LOADING)
             createExpense()
-//            Log.e("Returning to activity", "")
-//            val ouput = Intent()
-//            ouput.putExtra("expense",Gson().toJson(_expense))
-//
-//            Log.e("Returning to activity", ouput.getStringExtra("back") ?: "null")
-//
-//            requireActivity().setResult(99,ouput)
-//            requireActivity().finish()
+        }
+        binding.root.findViewById<Button>(R.id.btnContinue).setOnClickListener {
+
+            Log.e("Returning to activity", "")
+            val ouput = Intent()
+            ouput.putExtra("expense", Gson().toJson(_expense))
+
+            Log.e("Returning to activity", ouput.getStringExtra("back") ?: "null")
+
+            requireActivity().setResult(99, ouput)
+            requireActivity().finish()
         }
     }
 
@@ -108,40 +152,51 @@ class FirstFragment : Fragment() {
         _binding = null
     }
 
-    private fun bindUI(){
-        val view  = binding.root
+    private fun bindUI() {
+        val view = binding.root
+        _mainView = view.findViewById(R.id.main_content)
+        _successView = view.findViewById(R.id.success_layout)
+        _loadingView = view.findViewById(R.id.loading_content)
         _dateSelectorImageView = view.findViewById(R.id.ivDate)
         _tvDate = view.findViewById(R.id.tvDate)
         _categoriesDropdown = view.findViewById(R.id.dropdownCategories)
-        _etPrice = view.findViewById<EditText>(R.id.etPrice)
-        _etDescription = view.findViewById<EditText>(R.id.etDescription)
+        _etPrice = view.findViewById(R.id.etPrice)
+        _etDescription = view.findViewById(R.id.etDescription)
+
+
+        // _loadingLayout = _loadingView.findViewById(R.id.createExpenseLoadingLayout)
+        _successArrow = _successView.findViewById(R.id.ivArrow)
     }
 
     //expense methods
 
-    fun createExpense(){
+    private fun createExpense() {
 
 
         val vm = ViewModelProvider(requireActivity()).get(ExpenseHandlerViewModel::class.java)
-
-        val date :LocalDate = DateFormatter.toDate(_tvDate.text.toString())
-        val price : Double = _etPrice.text.toString().toDouble()
+        val date: LocalDate = DateFormatter.toDate(_tvDate.text.toString())
+        val price: Double = _etPrice.text.toString().toDouble()
         val description = _etDescription.text.toString()
         val category = _category
         Log.e("CATEGORY", "$_category")
 
-        val expense = Expense(id = null ,date = date.toEpochDay() * 24 * 60 *60 *1000, price = price, description = description, category = category)
+        val expense = Expense(
+            id = null,
+            date = date.toEpochDay() * 24 * 60 * 60 * 1000,
+            price = price,
+            description = description,
+            category = category
+        )
         _expense = expense
         vm.createExpense(expense)
 
     }
 
 
-
     //date selector methods
 
-    private fun onClickDateSelectorIcon(){
-        _dateSelectorImageView.setOnClickListener{
+    private fun onClickDateSelectorIcon() {
+        _dateSelectorImageView.setOnClickListener {
             showDatePicker()
         }
     }
@@ -156,9 +211,6 @@ class FirstFragment : Fragment() {
         }
         datePicker.show(requireActivity().supportFragmentManager, "datePicker")
     }
-
-
-
 
 
 }

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/createExpenseSuccessLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    android:visibility="gone"
+    >
+    <TextView
+        android:id="@+id/etSuccess"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="El gasto ha sido guardado con éxito"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/black"
+        android:textSize="28sp"
+        android:paddingHorizontal="5dp"
+        android:gravity="center_horizontal"
+        app:layout_constraintVertical_bias="0.112" />
+
+    <ImageView
+        android:id="@+id/ivArrow"
+        android:layout_width="125dp"
+        android:layout_height="277dp"
+        app:layout_constraintBottom_toTopOf="@+id/etSuccessBody"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/ic_arrow_down"
+        app:layout_constraintTop_toBottomOf="@+id/etSuccess" />
+
+    <TextView
+        android:id="@+id/etSuccessBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingHorizontal="5dp"
+        android:text="Pulsa continuar para volver a la pantalla de gastos"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.784" />
+
+    <Button
+        android:id="@+id/btnContinue"
+        android:layout_width="324dp"
+        android:layout_height="40dp"
+        android:background="@drawable/round_button"
+        android:gravity="center_horizontal"
+        android:text="Continuar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etSuccessBody"
+        app:layout_constraintVertical_bias="0.847" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

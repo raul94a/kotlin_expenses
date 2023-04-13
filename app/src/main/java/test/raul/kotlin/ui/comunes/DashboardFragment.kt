@@ -1,4 +1,4 @@
-package test.raul.kotlin.ui.personales.comunes
+package test.raul.kotlin.ui.comunes
 
 import android.os.Bundle
 import android.view.LayoutInflater
